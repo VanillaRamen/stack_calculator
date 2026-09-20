@@ -25,6 +25,8 @@ ssize_t mul(ssize_t, ssize_t);
 ssize_t div(ssize_t, ssize_t);
 /* debug methods */
 void debug_print_stack(stack_t *);
+/* help */
+void help();
 
 
 int main() {
@@ -51,6 +53,10 @@ int main() {
 		if (nread == 1) {
 			stack_push(&s, (ssize_t)n);
 			printf("Pushed %ld onto the stack.\n", (ssize_t)n);
+		}
+
+		if (!strcmp(input, "help")) {
+			help();
 		}
 
 		if (!strcmp(input, "pull")) {
@@ -142,5 +148,10 @@ ssize_t mul(ssize_t a, ssize_t b) {
 
 ssize_t div(ssize_t a, ssize_t b) {
 	if (b == 0) b = 1;
+
 	return a / b;
+}
+
+void help() {
+	printf("operations: help | some_integer | print | (add|sub|mul|div)\n");
 }

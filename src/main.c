@@ -153,5 +153,5 @@ ssize_t div(ssize_t a, ssize_t b) {
 }
 
 void help() {
-	printf("operations: help | some_integer | print | (add|sub|mul|div)\n");
+	printf("operations: help | some_integer | print | (add|sub|mul|div) | quit\n");
 }

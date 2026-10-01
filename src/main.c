@@ -23,6 +23,8 @@ ssize_t add(ssize_t, ssize_t);
 ssize_t sub(ssize_t, ssize_t);
 ssize_t mul(ssize_t, ssize_t);
 ssize_t div(ssize_t, ssize_t);
+/* printing */
+ssize_t print(stack_t *);
 /* debug methods */
 void debug_print_stack(stack_t *);
 /* help */
@@ -64,9 +66,7 @@ int main() {
 		}
 
 		if (!strcmp(input, "print")) {
-			printf("stack: ");
-			debug_print_stack(&s);
-			printf("\n");
+			print(&s);
 		}
 
 		if (!strcmp(input, "add")) {
@@ -93,6 +93,20 @@ int main() {
 
 
 /* method definitions */
+ssize_t print(stack_t *stack) {
+	if (stack->size == 0) {
+		printf("Stack is empty!\n");
+		return 0;
+	} else {
+		printf("Stack: ");
+		for (ssize_t i = 0; i < stack->size; i++) {
+			printf("%ld ", stack->n[i]);
+		}
+		printf("\n");
+		return stack->size;
+	}
+}
+
 void debug_print_stack(stack_t *stack) {
 	for (ssize_t i = 0; i < stack->size; i++) {
 		printf("%ld ", stack->n[i]);

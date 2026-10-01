@@ -150,17 +150,21 @@ ssize_t operate(stack_t *stack, ssize_t (*f)(ssize_t, ssize_t)) {
 }
 
 ssize_t add(ssize_t a, ssize_t b) {
+	printf("%ld + %ld\n", a, b);
 	return a + b;
 }
 
 ssize_t sub(ssize_t a, ssize_t b) {
+	printf("%ld - %ld\n", a, b);
 	return a - b;
 }
 ssize_t mul(ssize_t a, ssize_t b) {
+	printf("%ld * %ld\n", a, b);
 	return a * b;
 }
 
 ssize_t div(ssize_t a, ssize_t b) {
+	printf("%ld / %ld\n", a, b);
 	if (b == 0) b = 1;
 
 	return a / b;

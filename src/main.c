@@ -9,13 +9,15 @@
 /* stack definition */
 struct stack {
 	ssize_t size;
+	ssize_t ans;
+	ssize_t mem;
 	ssize_t n[STACK_MAX_SIZE];
 };
 typedef struct stack stack_t;
 
 /* method declarations */
 void init_stack(stack_t *);
-ssize_t stack_push(stack_t *, ssize_t);
+ssize_t stack_push(stack_t *, ssize_t, ssize_t *);
 ssize_t stack_pull(stack_t *);
 /* calculator parts */
 ssize_t operate(stack_t *, ssize_t (*)(ssize_t, ssize_t));
@@ -51,10 +53,16 @@ int main() {
 		if (!strcmp(input, "quit")) break;
 
 		int n;
+		ssize_t status = 0;
 		nread = sscanf(input, " %d", &n);
 		if (nread == 1) {
-			stack_push(&s, (ssize_t)n);
-			printf("Pushed %ld onto the stack.\n", (ssize_t)n);
+			stack_push(&s, (ssize_t)n, &status);
+			if (status == 0) {
+				printf("Pushed %ld onto the stack.\n", (ssize_t)n);
+			} else {
+				status = 0;
+				// err message handled by stack_push failure state
+			}
 		}
 
 		if (!strcmp(input, "help")) {
@@ -62,7 +70,27 @@ int main() {
 		}
 
 		if (!strcmp(input, "pull")) {
-			printf("Pulled %ld from the stack.\n", stack_pull(&s));
+			printf("Pulled %ld from the stack into stack side memory.\n", (s.mem = stack_pull(&s)) );
+		}
+
+		if (!strcmp(input, "mem")) {
+			stack_push(&s, s.mem, &status);
+			if (status == 0) {
+				printf("Pushed %ld onto the stack from side memory.\n", s.mem);
+			} else {
+				status = 0;
+				// err message handled by stack_push failure state
+			}
+		}
+
+		if (!strcmp(input, "ans")) {
+			stack_push(&s, s.ans, &status);
+			if (status == 0) {
+				printf("Pushed %ld onto the stack from ans memory.\n", s.ans);
+			} else {
+				status = 0;
+				// err message handled by stack_push failure state
+			}
 		}
 
 		if (!strcmp(input, "print")) {
@@ -70,19 +98,19 @@ int main() {
 		}
 
 		if (!strcmp(input, "add")) {
-			printf("Result: %ld\n", operate(&s, add));
+			printf("Result: %ld\n", (s.ans = operate(&s, add)));
 		}
 
 		if (!strcmp(input, "sub")) {
-			printf("Result: %ld\n", operate(&s, sub));
+			printf("Result: %ld\n", (s.ans = operate(&s, sub)));
 		}
 
 		if (!strcmp(input, "mul")) {
-			printf("Result: %ld\n", operate(&s, mul));
+			printf("Result: %ld\n", (s.ans = operate(&s, mul)));
 		}
 
 		if (!strcmp(input, "div")) {
-			printf("Result: %ld\n", operate(&s, div));
+			printf("Result: %ld\n", (s.ans = operate(&s, div)));
 		}
 
 		printf("\n");
@@ -96,15 +124,18 @@ int main() {
 ssize_t print(stack_t *stack) {
 	if (stack->size == 0) {
 		printf("Stack is empty!\n");
-		return 0;
 	} else {
 		printf("Stack: ");
 		for (ssize_t i = 0; i < stack->size; i++) {
 			printf("%ld ", stack->n[i]);
 		}
 		printf("\n");
-		return stack->size;
 	}
+
+	printf("Mem: %ld\n", stack->mem);
+	printf("Ans: %ld\n", stack->ans);
+
+	return stack->size;
 }
 
 void debug_print_stack(stack_t *stack) {
@@ -115,19 +146,22 @@ void debug_print_stack(stack_t *stack) {
 
 void init_stack(stack_t *stack) {
 	stack->size = 0;
+	stack->ans = 0;
+	stack->mem = 0;
 	return;
 }
 
-ssize_t stack_push(stack_t *stack, ssize_t n) {
+ssize_t stack_push(stack_t *stack, ssize_t n, ssize_t *status) {
 	if (stack->size >= STACK_MAX_SIZE) {
 		fprintf(stderr, "ERR: Stack is full (%lu items)! %ld not added to stack.\n", stack->size, n);
-		return 1;
+		*status = -1;
+		return n;
 	}
 
 	stack->n[stack->size] = n;
 	stack->size += 1;
 
-	return 0; // success
+	return n; // success
 }
 
 ssize_t stack_pull(stack_t *stack) {
@@ -171,5 +205,5 @@ ssize_t div(ssize_t a, ssize_t b) {
 }
 
 void help() {
-	printf("operations: help | some_integer | print | (add|sub|mul|div) | quit\n");
+	printf("operations: help | (int) | print | pull | ans | (add|sub|mul|div) | quit\n");
 }

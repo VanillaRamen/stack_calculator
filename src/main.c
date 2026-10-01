@@ -43,7 +43,7 @@ int main() {
 			return 1;
 		}
 
-		// force a C string
+		// force a C string && strip expected newline
 		input[nread - 1] = '\0';
 
 		if (!strcmp(input, "quit")) break;
